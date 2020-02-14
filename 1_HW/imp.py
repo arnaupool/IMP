@@ -56,9 +56,6 @@ def shell_calculation(input):
             if (set(vertex1) == set(vertex2)): s_vertex = s_vertex + 1
     
     print(s_vertex)
-
-
-    
     #print("The total number of shells of the provided file is: " + str(n_shell))
     print("This operation has not yet been implemented")
 
