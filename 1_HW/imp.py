@@ -2,10 +2,11 @@ import math
 
 def triangle_calculation(input):
     n_triangle = 0
-    for elem in input.readlines():
-        elem = str(elem).strip().split(' ')
-        if elem[0] == str("outer"):
-            n_triangle = n_triangle + 1
+    with open(input, 'r') as f:
+        for elem in f.readlines():
+            elem = str(elem).strip().split(' ')
+            if elem[0] == str("outer"):
+                n_triangle = n_triangle + 1
     
     print("The total number of triangles of the provided file is: " + str(n_triangle))
 
@@ -24,12 +25,10 @@ def point2vector(p1, p2):
 
 def surface_calculation(input):
     area = 0
-    vertex_list = []
-    for elem in input.readlines():
-        elem = elem.split()
-        if (elem[0] == str("vertex")):
-            elem.remove(elem[0])
-            vertex_list.append(elem)
+
+    with open(input, 'r') as f:
+        vertex_list = vertexfunc(f)
+
     for pos in range(0, len(vertex_list), 3):
         triangle = vertex_list[pos:pos+3]
         v1 = point2vector(triangle[0], triangle[1])
@@ -37,37 +36,59 @@ def surface_calculation(input):
         area =+ area + cross(list(v1), list(v2))/2
     print("The total area of the surface of the provided file is: " + str(round(area, 2)))
 
-def shell_calculation(input):
-    """ n_shell = 0
-    for elem in input.readlines():
-        elem = elem.split(' ')
+def vertexfunc(file):
+    vertex_l = []
+    for elem in file:
+        elem = elem.split()
+        if (elem[0] == str("vertex")):
+            elem.remove(elem[0])
+            vertex_l.append(elem)
+    return vertex_l
 
-        if elem[0] == str("solid"):
-            n_shell = n_shell + 1 """
+def shell_calculation(input):
+    n_shell = 0
+    s_vertex = 0
+
+    with open(input, 'r') as f:
+        vertex_list = vertexfunc(f)
+    for vertex1 in vertex_list:
+        for vertex2 in vertex_list:
+            if (set(vertex1) == set(vertex2)): s_vertex = s_vertex + 1
+    
+    print(s_vertex)
+
+
     
     #print("The total number of shells of the provided file is: " + str(n_shell))
     print("This operation has not yet been implemented")
 
+def allop (input):
+    triangle_calculation(input)
+    surface_calculation(input)
+    shell_calculation(input)
 
-operations = {'1': triangle_calculation, '2': surface_calculation, '3': shell_calculation}
+operations = {'1': triangle_calculation, '2': surface_calculation, '3': shell_calculation, '4': allop}
 
 if __name__ == '__main__':
-    filename = input("Enter the name of the file\n")
+    filename = input("Enter the name of the file and its extension:\n")
     try:
-        userinput = open(filename, 'r')
+        f = open(filename, 'r')
     except FileNotFoundError:
         print("Error 404 - File not found")
-        quit()
-
-    print("What operation do you want to do?\n1. Number of triangles\n2. Total surface of the 3D object(s)\n3. Number of shells\n\n")
+        quit() 
+    f.close()
+    print("\nWhat operation do you want to do?\n1. Number of triangles\n2. Total surface of the 3D object(s)\n3. Number of shells\n4. All of the above\n")
     option = input("Select a number to continue\n")
-    #operations[option](userinput)
+
     try:
-        operations[option](userinput)
+        operations[option](filename)
     except UnicodeDecodeError:
         print("File is not in ASCII format")
     except KeyError:
         print("That value is not within the range")
+    f.close()
+    quit()  
+    
     
     
 """ You have to write some code for reading an STL file and printing out:
