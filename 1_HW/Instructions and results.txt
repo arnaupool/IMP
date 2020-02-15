@@ -6,18 +6,18 @@ Once downloaded, to execute the script open a terminal window and type in
 In order to select a file, you'll have to type in its name and file extension,
 i.e.: cube.stl
 
-Attached you'll find some test files, here are the results:
+Attached you'll find some test files, here are some of the results:
 
  - cube.stl				(https://www.thingiverse.com/thing:34553)
 	- Triangles: 	    12
 	- Area: 	    2400.0
-	- Number of shells: 1
+	- Number of shells: ?
 
 
  - octopus.stl				(https://www.thingiverse.com/thing:3495390)
 	- Triangles: 	    328876
 	- Area: 	    19194.44
-	- Number of shells: 1
+	- Number of shells: ?
 
 
  - puzzle9.stl				(https://www.thingiverse.com/thing:3869548)

@@ -1,4 +1,5 @@
 import math
+from collections import Counter
 
 def triangle_calculation(input):
     n_triangle = 0
@@ -49,15 +50,12 @@ def shell_calculation(input):
     n_shell = 0
     s_vertex = 0
 
-    with open(input, 'r') as f:
+    """with open(input, 'r') as f:
         vertex_list = vertexfunc(f)
-    for vertex1 in vertex_list:
-        for vertex2 in vertex_list:
-            if (set(vertex1) == set(vertex2)): s_vertex = s_vertex + 1
-    
-    print(s_vertex)
-    #print("The total number of shells of the provided file is: " + str(n_shell))
-    print("This operation has not yet been implemented")
+    vertex_list = map(tuple, vertex_list)
+    counter = Counter(x for x in vertex_list) """
+
+    print("Shell_Calculation has not yet been implemented")
 
 def allop (input):
     triangle_calculation(input)
