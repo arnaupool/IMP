@@ -1,7 +1,11 @@
+import math
+
 vertex_list = []
 filename = None
 down_tr =  0
 total_tr = 0
+total_area = 0
+overhang_area = 0
 
 def initialize():             #Figuring out z0
     global filename
@@ -19,11 +23,16 @@ def create_output_file():     #Creating and populating output file
     global vertex_list
     f = open("out.stl", 'w')
     f.write("solid OpenSCAD_Model\n")
+    #print(vertex_list)
+    #vertex_list = clear_clutter(vertex_list)
     for elem in vertex_list:
         f.write(str(elem[0]))
         f.write("\touter loop\n")
         for inv in elem[1]:
-            f.write(inv)
+            f.write("\t\tvertex ")
+            for coord in inv:
+                f.write(str(coord) + " ")
+            f.write("\n")
         f.write("\tendloop\n")
         f.write("  endfacet\n")
     f.write("endsolid OpenSCAD_Model")
@@ -35,6 +44,8 @@ def overhang_calc(z0):        #Calculation of number of total triangles and numb
     global down_tr
     global vertex_list
     global total_tr
+    global total_area
+    global overhang_area
     with open(filename, 'r') as f:
         lines = f.readlines()
         for i in range(0, len(lines)):
@@ -42,20 +53,45 @@ def overhang_calc(z0):        #Calculation of number of total triangles and numb
             elem = str(line).strip().split(' ')
             if (str(elem[0]) == "facet"):
                 total_tr = total_tr + 1
+                v_list = clear_clutter(lines[i+2:i+5])
+                total_area = total_area + tr_area(v_list)
                 if (0 >= float(elem[4])):
-                    list = lines[i+2:i+5]
-                    if (base_triangles(z0, list)):
-                        vertex_list.append([line, list])
+                    if (base_triangles(z0, v_list)):
+                        overhang_area = overhang_area + tr_area(v_list)
+                        vertex_list.append([line, v_list])
                         down_tr = down_tr + 1
     f.close()
 
+def clear_clutter(v_list):
+    for i in range(len(v_list)):
+        v_list[i] = str(v_list[i]).replace('vertex', '').replace('\n', '').strip().split(' ')
+    return v_list
+
+def cross(v1, v2):
+    v1 = [float(i) for i in v1]
+    v2 = [float(i) for i in v2] 
+    s1 = v1[1] * v2[2] - v1[2] * v2[1]
+    s2 = v1[2] * v2[0] - v1[0] * v2[2]
+    s3 = v1[0] * v2[1] - v1[1] * v2[0]
+    return math.sqrt(math.pow(s1,2) + math.pow(s2,2) + math.pow(s3,2))
+
+def point2vector(p1, p2):
+    p1 = [float(i) for i in p1]
+    p2 = [float(i) for i in p2]
+    ''' print(str(p1))
+    print(str(p2)) '''
+    return [p1[0] - p2[0], p1[1] - p2[1], p1[2] - p2[2]]
+
 def base_triangles(z0, v_list):
-    #v_list_split = str(v_list).strip().split(' ')
     for elem in v_list:
-        elem = str(elem).replace('vertex', '').replace('\n', '').strip().split(' ')
         if (elem[2] == z0):
             return False
     return True
+
+def tr_area(v_list):
+    v1 = point2vector(v_list[0], v_list[1])
+    v2 = point2vector(v_list[0], v_list[2])
+    return cross(list(v1), list(v2))/2
 
 if __name__ == '__main__':
     filename = input("Enter the name of the file and its extension:\n")
@@ -65,18 +101,11 @@ if __name__ == '__main__':
         print("Error 404 - File not found")
         quit() 
     f.close()
-    try:
-        overhang_calc(initialize())
-        #bottom_face_vertex(initialize())
-        create_output_file()
-        print(down_tr)
-        print(total_tr)
-        print("Overhangs = " + str(format(float((down_tr/total_tr) * 100), '.2f')) + " %")
-        #do everything
-        pass
-    except UnicodeDecodeError:
-        print("File is not in ASCII format")
-    f.close()
+    overhang_calc(initialize())
+    create_output_file()
+    print("\nTotal area     =  " + str(format(float(total_area), '.2f')))
+    print("Overhang area  =  " + str(format(float(overhang_area), '.2f')))
+    print("Overhang       =  " + str(format(float((down_tr/total_tr) * 100), '.2f')) + " %")
     quit()
 
 """
